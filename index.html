@@ -384,7 +384,7 @@ dialog[open] ~ .cue{display:none}
     </div>
     <div class="in panel" data-panel="sobre">
       <div class="col"><p>Sobre mí</p><a href="#sobre">Quién soy</a><a href="#clientes">Clientes</a><a href="#contacto">Contacto</a></div>
-      <div class="col small"><p>Estudio</p><a href="#contacto">Barcelona</a><a href="#contacto">hello@gerardcollstudio.com</a></div>
+      <div class="col small"><p>Estudio</p><a href="#contacto">hello@gerardcollstudio.com</a></div>
     </div>
     <div class="in mlist"><a href="#proyectos">Proyectos</a><a href="#testimonios">Testimonios</a><a href="#sobre">Sobre mí</a><a href="#contacto">Contacto</a></div>
   </div></div>
@@ -463,7 +463,7 @@ dialog[open] ~ .cue{display:none}
       <div><h4>Proyectos</h4><span id="dirProjects"></span></div>
       
       <div><h4>Estudio</h4><a href="#sobre">Sobre mí</a><a href="#clientes">Clientes</a></div>
-      <div><h4>Contacto</h4><a href="mailto:hello@gerardcollstudio.com">Email</a><a href="#contacto">Barcelona</a></div>
+      <div><h4>Contacto</h4><a href="mailto:hello@gerardcollstudio.com">Email</a></div>
     </div>
     <div class="legal"><span>© 2026 Gerard Coll Studio. Todos los derechos reservados.</span><span>Aviso legal · Privacidad</span></div>
   </div>
@@ -566,11 +566,14 @@ document.addEventListener("click", e => {
 });
 
 /* Pinned hero image: grows from a rounded card to full-bleed while you scroll */
-const heroP = [["kappa","Kappa SS26"],["honda","Honda CB650R"],["gravel","Gravel"],["networkia","Networkia Workspaces"],["tous","Tous · Bar Apolo"],["tousschool","Tous School"]];
+/* Every visible project, in the same order and with the same cover as in Proyectos (Honda's cover is small, so it keeps its 2560px hero copy) */
+const heroBig = {"honda-cb650r":"honda"};
+const heroP = P.map(p => [p.id, p.title, `img/${p.stills[0]}`]);
 const gf = $("growFrame"), cap = $("growCap");
-heroP.forEach(([f],j) => { const im = new Image(); im.srcset = `img/h/${f}-1280.jpg 1280w, img/h/${f}.jpg 2560w`; im.sizes = "100vw"; im.src = `img/h/${f}.jpg`; im.alt = ""; if (!j) im.className = "on"; gf.insertBefore(im, $("growShade")); });
-let hk = 0; cap.textContent = heroP[0][1];
-setInterval(() => { const ims = gf.querySelectorAll("img"); ims[hk].className = ""; hk = (hk+1) % ims.length; ims[hk].className = "on"; cap.textContent = heroP[hk][1]; }, 4000);
+const capTxt = t => t.replace(" | ", '<span class="tbar" aria-hidden="true"></span><span class="sr"> | </span>');
+heroP.forEach(([id,,src],j) => { const im = new Image(), h = heroBig[id]; if (h) { im.srcset = `img/h/${h}-1280.jpg 1280w, img/h/${h}.jpg 2560w`; im.sizes = "100vw"; im.src = `img/h/${h}.jpg`; } else im.src = src; im.alt = ""; im.decoding = "async"; if (j) im.loading = "lazy"; else im.className = "on"; gf.insertBefore(im, $("growShade")); });
+let hk = 0; cap.innerHTML = capTxt(heroP[0][1]);
+setInterval(() => { const ims = gf.querySelectorAll("img"); ims[hk].className = ""; hk = (hk+1) % ims.length; ims[hk].className = "on"; cap.innerHTML = capTxt(heroP[hk][1]); }, 4000);
 const grow = $("grow");
 /* The frame eases toward the scroll position each frame, which hides uneven scroll events on phones */
 const shade = $("growShade");
