@@ -656,6 +656,7 @@ qf.addEventListener("input", e => e.target.classList.remove("bad"));
 /* Testimonials: reviews arrive by email; the approved ones go in T */
 const T = [
   // {stars:5, text:"…", name:"Nombre", role:"Rol, Empresa", photo:"img/resenas/nombre.jpg"},
+  {stars:5, text:"todo top!", name:"Gerard Coll", role:"Director"}, // test review from Gerard, 2026-10-30: remove when he says
 ];
 const escT = t => t.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const initials = n => n.split(/\s+/).slice(0,2).map(w => w[0] || "").join("").toUpperCase();
