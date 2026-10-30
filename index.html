@@ -683,7 +683,7 @@ rvf.addEventListener("submit", async e => {
         Estrellas:"★".repeat(+d.estrellas), Nombre:d.nombre, Email:d.email, "Rol y empresa":d.rol, "Trabajamos como":d.relacion, "Reseña":d.testimonio, Consentimiento:d.consentimiento || "no"})});
     const j = await r.json().catch(() => ({}));
     if (!r.ok || !j.success) throw new Error(j.message || r.status);
-    rvf.reset(); $("rv-count").textContent = "0/280"; rmsg.textContent = ""; rv.close(); toast("¡Gracias por tu reseña! La publicaré en cuanto la revise.");
+    rvf.reset(); $("rv-count").textContent = "0/280"; rmsg.textContent = ""; rv.close(); toast("¡Gracias por contestar!");
   } catch (err) {
     console.warn("Reseña:", err);
     rmsg.className = "qf-msg"; rmsg.innerHTML = 'No se ha podido enviar ahora mismo. Inténtalo de nuevo en un momento o escríbeme a <a href="mailto:hello@gerardcollstudio.com">hello@gerardcollstudio.com</a>.';
