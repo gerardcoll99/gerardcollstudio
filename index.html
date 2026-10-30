@@ -439,7 +439,8 @@ dialog[open] ~ .cue{display:none}
       <div class="blobs" aria-hidden="true"><i></i><i></i><i></i></div>
       <h2 style="position:relative"><span class="head">¿Tienes un</span><br><span class="grad">proyecto?</span></h2>
       <p class="cta-sub">Cuéntame la idea y te respondo en menos de 48 horas.</p>
-      <form class="qf" id="qf" novalidate>
+      <form class="qf" id="qf" method="POST" action="https://formsubmit.co/hello@gerardcollstudio.com" novalidate>
+        <input type="hidden" name="_subject" value="Nuevo proyecto"><input type="hidden" name="_next" value=""><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table">
         <label><span>Nombre</span><input name="nombre" autocomplete="name" required></label>
         <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
         <label><span>Teléfono</span><input name="telefono" type="tel" autocomplete="tel"></label>
@@ -643,20 +644,14 @@ qf.addEventListener("submit", async e => {
   const bad = qf.querySelector(".bad");
   if (bad) { qmsg.className = "qf-msg"; qmsg.textContent = "Revisa los campos marcados."; bad.focus(); return; }
   if (qf._honey.value) return;
-  const d = Object.fromEntries(new FormData(qf)); delete d._honey;
+  const d = Object.fromEntries(new FormData(qf));
   const live = /(^|\.)gerardcollstudio\.com$|github\.io$/.test(location.hostname);
   if (!live) { qmsg.className = "qf-msg ok"; qmsg.textContent = "Vista previa: en la web publicada este mensaje te llegará por email."; return; }
-  const btn = qf.querySelector("button"); btn.disabled = true; qmsg.className = "qf-msg"; qmsg.textContent = "Enviando…";
-  try {
-    const r = await fetch("https://formsubmit.co/ajax/hello@gerardcollstudio.com", {method:"POST", headers:{"Content-Type":"application/json", Accept:"application/json"},
-      body: JSON.stringify({...d, _subject:`Nuevo proyecto: ${d.nombre}`, _replyto:d.email, _template:"table", _captcha:"false"})});
-    if (!r.ok) throw 0;
-    qf.reset(); qmsg.className = "qf-msg ok"; qmsg.textContent = "¡Gracias! Te escribo muy pronto.";
-  } catch {
-    const body = `Nombre: ${d.nombre}\nEmail: ${d.email}\nTeléfono: ${d.telefono}\nEmpresa: ${d.empresa}\nTipo: ${d.tipo}\n\n${d.idea}`;
-    location.href = `mailto:hello@gerardcollstudio.com?subject=${encodeURIComponent("Nuevo proyecto: " + d.nombre)}&body=${encodeURIComponent(body)}`;
-    qmsg.textContent = "No se pudo enviar desde aquí; se ha abierto tu correo con el mensaje listo.";
-  } finally { btn.disabled = false; }
+  // A normal form POST (like the review form): no CORS, and FormSubmit sends the visitor straight back to #mensaje-enviado
+  qf._subject.value = `Nuevo proyecto: ${d.nombre}`;
+  qf._next.value = location.origin + location.pathname + "#mensaje-enviado";
+  qf.querySelector("button").disabled = true; qmsg.className = "qf-msg"; qmsg.textContent = "Enviando…";
+  qf.submit();
 });
 qf.addEventListener("input", e => e.target.classList.remove("bad"));
 
@@ -686,8 +681,9 @@ foto.addEventListener("change", async () => {
   } catch {}
   avp.style.backgroundImage = `url(${URL.createObjectURL(foto.files[0])})`; avp.classList.add("on");
 });
-if (location.hash == "#resena-enviada") {
-  const t = Object.assign(document.createElement("div"), {className:"rv-toast", role:"status", textContent:"¡Gracias por tu reseña! La publicaré en cuanto la revise."});
+const sent = {"#resena-enviada":"¡Gracias por tu reseña! La publicaré en cuanto la revise.", "#mensaje-enviado":"¡Gracias! He recibido tu mensaje y te escribo muy pronto."}[location.hash];
+if (sent) {
+  const t = Object.assign(document.createElement("div"), {className:"rv-toast", role:"status", textContent:sent});
   document.body.append(t); setTimeout(() => t.remove(), 6000); history.replaceState(null, "", location.pathname);
 }
 rvf.testimonio.addEventListener("input", () => $("rv-count").textContent = `${rvf.testimonio.value.length}/280`);
