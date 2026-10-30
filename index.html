@@ -439,8 +439,7 @@ dialog[open] ~ .cue{display:none}
       <div class="blobs" aria-hidden="true"><i></i><i></i><i></i></div>
       <h2 style="position:relative"><span class="head">¿Tienes un</span><br><span class="grad">proyecto?</span></h2>
       <p class="cta-sub">Cuéntame la idea y te respondo en menos de 48 horas.</p>
-      <form class="qf" id="qf" method="POST" action="https://formsubmit.co/hello@gerardcollstudio.com" novalidate>
-        <input type="hidden" name="_subject" value="Nuevo proyecto"><input type="hidden" name="_next" value=""><input type="hidden" name="_captcha" value="false"><input type="hidden" name="_template" value="table">
+      <form class="qf" id="qf" novalidate>
         <label><span>Nombre</span><input name="nombre" autocomplete="name" required></label>
         <label><span>Email</span><input name="email" type="email" autocomplete="email" required></label>
         <label><span>Teléfono</span><input name="telefono" type="tel" autocomplete="tel"></label>
@@ -637,6 +636,7 @@ document.querySelectorAll(".card .plus").forEach(b => b.onclick = () => { const 
 
 /* Contact form: sends to hello@gerardcollstudio.com through FormSubmit once the site is live */
 const qf = $("qf"), qmsg = $("qf-msg");
+const W3F_KEY = "3edaee3f-3619-47a1-8389-83c7ee288358";
 qf.addEventListener("submit", async e => {
   e.preventDefault();
   const req = [...qf.querySelectorAll("[required]")];
@@ -647,11 +647,19 @@ qf.addEventListener("submit", async e => {
   const d = Object.fromEntries(new FormData(qf));
   const live = /(^|\.)gerardcollstudio\.com$|github\.io$/.test(location.hostname);
   if (!live) { qmsg.className = "qf-msg ok"; qmsg.textContent = "Vista previa: en la web publicada este mensaje te llegará por email."; return; }
-  // A normal form POST (like the review form): no CORS, and FormSubmit sends the visitor straight back to #mensaje-enviado
-  qf._subject.value = `Nuevo proyecto: ${d.nombre}`;
-  qf._next.value = location.origin + location.pathname + "#mensaje-enviado";
-  qf.querySelector("button").disabled = true; qmsg.className = "qf-msg"; qmsg.textContent = "Enviando…";
-  qf.submit();
+  const btn = qf.querySelector("button"); btn.disabled = true; qmsg.className = "qf-msg"; qmsg.textContent = "Enviando…";
+  try {
+    // Web3Forms emails hello@gerardcollstudio.com; the access key only lets this form send to that inbox
+    const r = await fetch("https://api.web3forms.com/submit", {method:"POST", headers:{"Content-Type":"application/json", Accept:"application/json"},
+      body: JSON.stringify({access_key:W3F_KEY, subject:`Nuevo proyecto: ${d.nombre}`, from_name:"gerardcollstudio.com", replyto:d.email,
+        Nombre:d.nombre, Email:d.email, "Teléfono":d.telefono, Empresa:d.empresa, Tipo:d.tipo, Idea:d.idea})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.success) throw new Error(j.message || r.status);
+    qf.reset(); qmsg.className = "qf-msg ok"; qmsg.textContent = "¡Gracias! He recibido tu mensaje y te escribo muy pronto.";
+  } catch (err) {
+    console.warn("Formulario:", err);
+    qmsg.className = "qf-msg"; qmsg.innerHTML = 'No se ha podido enviar ahora mismo. Inténtalo de nuevo en un momento o escríbeme a <a href="mailto:hello@gerardcollstudio.com">hello@gerardcollstudio.com</a>.';
+  } finally { btn.disabled = false; }
 });
 qf.addEventListener("input", e => e.target.classList.remove("bad"));
 
