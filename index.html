@@ -190,9 +190,9 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;margin:0;text-wrap:ba
 .about h2{font-size:clamp(40px,5.4vw,72px);font-weight:700;letter-spacing:-.035em;line-height:1.05;margin:0 0 22px}
 .about .tx > p:not(.eyebrow){font-size:clamp(18px,1.7vw,22px);line-height:1.45;color:var(--muted);margin:0 0 16px;max-width:36ch}
 .about .more{margin-top:8px}
-.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 32px;margin:6px 0 30px;padding-top:26px;border-top:1px solid var(--line);max-width:620px}
-@media (max-width:520px){.stats{grid-template-columns:1fr}}
-.stat .num{font-size:clamp(56px,5.6vw,92px);font-weight:700;letter-spacing:-.05em;line-height:.95;margin:0;font-variant-numeric:tabular-nums;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stats{display:flex;flex-wrap:wrap;gap:28px clamp(28px,3.5vw,56px);margin:6px 0 30px;padding-top:26px;border-top:1px solid var(--line);max-width:760px}
+@media (max-width:520px){.stats{flex-direction:column}}
+.stat .num{font-size:clamp(56px,5.6vw,92px);font-weight:700;letter-spacing:-.05em;line-height:.95;margin:0;white-space:nowrap;font-variant-numeric:tabular-nums;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .stat .lbl{font-size:clamp(17px,1.5vw,21px);font-weight:600;color:var(--fg);margin:12px 0 0;max-width:16ch;line-height:1.3}
 @media (max-width:720px){.about{grid-template-columns:1fr}}
 .clients{padding-block:clamp(50px,7vw,90px) 0;text-align:center}
@@ -595,6 +595,7 @@ document.querySelectorAll(".count").forEach(el => new IntersectionObserver((es, 
   if (!es[0].isIntersecting) return; o.disconnect();
   if (reduce) return;
   const to = +el.dataset.to, t0 = performance.now();
+  el.style.cssText = `display:inline-block;min-width:${el.offsetWidth}px`; // keep the final width so nothing shifts
   (function tick(t){ const k = Math.min(1, (t - t0) / 2800); el.textContent = fmt(Math.round(to * (1 - Math.pow(1-k, 5)))); if (k < 1) requestAnimationFrame(tick); })(t0);
 }, {threshold:.6}).observe(el));
 const cue = $("cue");
