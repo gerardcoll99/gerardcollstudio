@@ -257,7 +257,7 @@ h1,h2,h3{font-family:var(--display);letter-spacing:-.025em;margin:0;text-wrap:ba
 /* Testimonials slide sideways like the brand carousel; arrows appear only when the cards overflow */
 .tcar{display:flex;align-items:center;gap:14px;margin-top:clamp(28px,4vw,44px)}
 .tcar:has(.tcards:empty){display:none}
-.tcar .arr{flex:none}.tcar.scroll .arr{display:grid}
+[data-brands] .tcar .arr{display:none;flex:none}[data-brands] .tcar.scroll .arr{display:grid}
 .tcards{flex:1;display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;padding-block:6px 30px}
 .tcards::-webkit-scrollbar{display:none}
 .tcar.scroll .tcards{-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
@@ -664,6 +664,7 @@ qf.addEventListener("input", e => e.target.classList.remove("bad"));
 /* Testimonials: reviews arrive by email; the approved ones go in T */
 const T = [
   // {stars:5, text:"…", name:"Nombre", role:"Rol, Empresa", photo:"img/resenas/nombre.jpg"},
+  {stars:5, text:"Destacamos la calidad de su trabajo audiovisual, su capacidad para comprender la identidad visual de una marca y adaptarse a distintos entornos creativos. Su implicación, trabajo en equipo y generosidad al compartir conocimientos hacen que sea un placer trabajar con él.", name:"Castellar Clinic", role:"Clínica de medicina estética"},
 ];
 const escT = t => t.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 const initials = n => n.split(/\s+/).slice(0,2).map(w => w[0] || "").join("").toUpperCase();
